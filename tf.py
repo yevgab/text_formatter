@@ -43,15 +43,43 @@ class TextFormat():
         m = re.match("^\?(\w+)\ +.*", line)
         if m != None:
             cmd = m.group(1)
-            if cmd == "align":
-                self.CmdAlign(line)
-            elif cmd == "size":
+            if cmd == "size":
                 self.CmdSize(line)
-            elif cmd == 
+            elif cmd == "align":
+                self.CmdAlign(line)
+            elif cmd == "par":
+                self.CmdPar(line)
+            elif cmd == "offset":
+                self.CmdOffset(line)
+            elif cmd == "interval":
+                self.CmdInterval(line)
+            elif cmd == "feed":
+                self.CmdFeed(line)
+            elif cmd == "feed_lines":
+                self.CmdFeedLines(line)
+            elif cmd == "page_break":
+                self.CmdPageBreak(line)
+            elif cmd == "left":
+                self.CmdLeft(line)
+            elif cmd == "header":
+                self.CmdHeader(line)
+            elif cmd == "p_num":
+                self.CmdPNum(line)
+            elif cmd == "br":
+                self.CmdBr(line)
+            elif cmd == "footnote":
+                self.CmdFootnote(line)
+            elif cmd == "alias":
+                self.CmdAlias(line)
+                
         else:
             cmd = "Unknown Command"
         print("Command found:", cmd)
 
+        
+    def CmdSize(self, line):
+        pass
+    
     def CmdAlign(self, line):
         pass
 
