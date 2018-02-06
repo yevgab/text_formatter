@@ -5,7 +5,7 @@ Command list:
     ?size w,h
             -sets new page size, closes current page and starts a new one
     
-    ?align fill|left|right|center
+    ?align fill|left|right|center|as_is
             -sets new paragraph alignment; closes current paragraph and starts 
              a new one
 
