@@ -83,11 +83,41 @@ class TextFormat():
     def CmdAlign(self, line):
         pass
 
+    def CmdPar(self, line):
+        pass
 
+    def CmdOffset(self, line):
+        pass
 
+    def CmdInterval(self, line):
+        pass
 
-    
+    def CmdFeed(self, line):
+        pass
 
+    def CmdFeedLines(self, line):
+        pass
+
+    def CmdPageBreak(self, line):
+        pass
+
+    def CmdLeft(self, line):
+        pass
+
+    def CmdHeader(self, line):
+        pass
+
+    def CmdPNum(self, line):
+        pass
+
+    def CmdBr(self, line):
+        pass
+
+    def CmdFootnote(self, line):
+        pass
+
+    def CmdAlias(self, line):
+        pass  
 
 
 
