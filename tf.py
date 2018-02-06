@@ -75,7 +75,7 @@ class TextFormat():
             print(line)
             self.left -= 1
             return
-        line = self.prev_line + ' ' + line
+        line = self.prev_line + ' ' + line.strip()
         if self.first_line:
             ind = self.indent
         else:
@@ -91,8 +91,13 @@ class TextFormat():
             s = self.LineAlign(s)
             # Вывести строку в стандартный вывод
             print(s)
+            self.left -= 1
+            if self.left = 0:
+                self.prev_line = line
+                break
 
     def LineAlign(self, s):
+        
         return s
 
     def LineCut(self, line, cw):
