@@ -92,7 +92,7 @@ class TextFormat():
             # Вывести строку в стандартный вывод
             print(s)
             self.left -= 1
-            if self.left = 0:
+            if self.left == 0:
                 self.prev_line = line
                 break
 
