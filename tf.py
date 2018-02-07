@@ -124,12 +124,11 @@ class TextFormat():
             pass    
 
         if normal_str:
+            s = s.ljust(ln + self.offset[1])
             if self.first_line:
-                s = s.rjust(ln + self.offset[0] + self.indent).ljust(ln
-                    + self.offset[0] + self.offset[1] + self.indent)
+                s = s.rjust(ln + self.offset[0] + self.indent)
             else:
-                s = s.rjust(ln + self.offset[0]).ljust(ln + self.offset[0]
-                    + self.offset[1])
+                s = s.rjust(ln + self.offset[0])
                 
         return s
 
