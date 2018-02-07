@@ -59,7 +59,7 @@ class TextFormat():
 
     def ProcessLine(self, line):
         line = self.RemoveCRLF(line)
-        if re.match("^\?\w+\ +.*", line) != None:
+        if re.match(r"^\?\w+\ +.*", line) != None:
             self.ProcessCommand(line)
         else:
             self.FormatLine(line)
