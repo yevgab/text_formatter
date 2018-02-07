@@ -1,7 +1,9 @@
 # text_formatter
 Task from the Charles Weatherell's book Etudes for Programmers
 
+
 Command list:
+
     ?size w,h
             -sets new page size, closes current page and starts a new one
     
