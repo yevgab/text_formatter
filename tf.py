@@ -69,7 +69,7 @@ class TextFormat():
     def FormatLine(self, line):
         if self.fn_lines > 0:
             self.FormatFNLine(line)
-            self.fn_line -= 1
+            self.fn_lines -= 1
             return
         if self.align == A_AS_IS:
             print(line)
@@ -92,7 +92,7 @@ class TextFormat():
             # Вывести строку в стандартный вывод
             print(s)
             self.left -= 1
-            if self.left = 0:
+            if self.left == 0:
                 self.prev_line = line
                 break
 
