@@ -75,12 +75,17 @@ class TextFormat():
             print(line)
             self.left -= 1
             return
-        line = self.prev_line + ' ' + line.strip()
+
+        line = line.strip()
+        if line == "":
+            self.Flush()
+            return
+
+        line = self.prev_line + ' ' + line
+        cw = self.w - self.offset[0] - self.offset[1]
         if self.first_line:
-            ind = self.indent
-        else:
-            ind = 0
-        cw = self.w - self.offset[0] - self.offset[1] - ind
+            cw += self.indent
+       
         while len(line) >= cw:
             s, line = self.LineCut(line, cw)
             if s == "":
@@ -88,16 +93,44 @@ class TextFormat():
                 break
             # Отформатировать строку в соответствии с текущими 
             # настройками выравнивания
-            s = self.LineAlign(s)
+            s = self.LineAlign(s, cw)
             # Вывести строку в стандартный вывод
+            self.first_line = False
+            cw = self.w - self.offset[0] - self.offset[1]
             print(s)
             self.left -= 1
             if self.left == 0:
                 self.prev_line = line
                 break
+        else:
+            self.prev_line = line
 
-    def LineAlign(self, s):
-        
+    def LineAlign(self, s, normal_str = True):
+        if normal_str:
+            ln = self.w - self.offset[0] - self.offset[1]
+            if self.first_line:
+                ln -= self.indent
+        else:
+            # TODO: calculate ln for footnotes (flag normal_str as false)
+            pass
+
+        if self.align == A_RIGHT:
+            s = s.rjust(ln)
+
+        elif self.align == A_CENTER:
+            s = s.center(ln)
+
+        elif self.align == A_FILL:
+            pass    
+
+        if normal_str:
+            if self.first_line:
+                s = s.rjust(ln + self.offset[0] + self.indent).ljust(ln
+                    + self.offset[0] + self.offset[1] + self.indent)
+            else:
+                s = s.rjust(ln + self.offset[0]).ljust(ln + self.offset[0]
+                    + self.offset[1])
+                
         return s
 
     def LineCut(self, line, cw):
@@ -119,9 +152,11 @@ class TextFormat():
     def PageInit(self):
         pass
 
-    def PageClose(self):
+    def PageClose(self, not_start_new_page = False):
         print('\f')
         self.left = self.h
+        if not not_start_new_page:
+            self.PageInit()
         
 
     def RemoveCRLF(self, line):
@@ -132,9 +167,27 @@ class TextFormat():
         if pos != -1:
             line = line[:pos]
         return line
-    
+
+    def Flush(self, close_document = False):
+        if self.left == 0:
+            self.PageClose()
+
+        if self.align == A_CENTER or self.align == A_RIGHT:
+            print(self.LineAlign(self.prev_line))
+        else:
+            print(self.prev_line)
+        
+        self.prev_line = ""
+        self.first_line = True
+
+        if close_document:
+            self.PrintFNotes()
+
+    def PrintFNotes(self):
+        pass
+        
     def ProcessCommand(self, line):
-        m = re.match("^\?(\w+)\ +.*", line)
+        m = re.match(r"^\?(\w+)\ +.*", line)
         if m != None:
             cmd = m.group(1)
             if cmd == "size":
@@ -233,6 +286,8 @@ def main():
 
     for l in inf:
         tf.ProcessLine(l)
+    
+    tf.Flush()
 
 
 
