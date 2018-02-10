@@ -12,6 +12,7 @@ import argparse
 import sys
 import codecs
 import re
+import random
 
 # fill|left|right|center|as_is
 A_FILL   = 0
@@ -42,7 +43,7 @@ class TextFormat():
         self.w = w
         self.h = h
         self.left = self.h
-        self.align = A_LEFT
+        self.align = A_FILL
         self.header_pos = H_NONE
         self.indent = 0
         self.offset = (0, 0)
@@ -121,7 +122,28 @@ class TextFormat():
             s = s.center(ln)
 
         elif self.align == A_FILL:
-            pass    
+            # Разбить строку на слова
+            ww = s.split()
+            # Посчитать суммарную длину всех слов
+            wln = 0
+            for w in ww:
+                wln += len(w)
+            # Определить минимальное количество пробелов в строке
+            min_s = int((ln - wln) / (len(ww) - 1))
+            # Расставить в случайные позиции оставшиеся пробелы
+            sp = ln - wln - min_s * (len(ww) - 1)
+            spp = set()
+            while sp > 0:
+                sppl = len(spp)
+                spp.add(random.randint(0, len(ww) - 2))
+                if len(spp) > sppl:
+                    sp -= 1
+            s = ww[0]
+            for p, w in enumerate(ww[1:]):
+                if p in spp:
+                    s += " "
+                s += w.rjust(len(w) + min_s)
+
 
         if normal_str:
             s = s.ljust(ln + self.offset[1])
@@ -139,7 +161,7 @@ class TextFormat():
         last_space = line.rfind(' ', 0, cw)
         if last_space >= 0:
             s = line[:last_space]
-            line = line[last_space:]
+            line = line[last_space + 1:]
         else:
             s = ""
 
@@ -220,14 +242,33 @@ class TextFormat():
                 
         else:
             cmd = "Unknown Command"
-        print("Command found:", cmd)
+            print("Command found:", cmd)
 
         
     def CmdSize(self, line):
         pass
     
     def CmdAlign(self, line):
-        pass
+        m = re.match(r"^\?align\ +(left|right|center|fill|as_is){1}", line)
+        if m != None:
+            align = m.group(1)
+            if align == "left":
+                self.Flush()
+                self.align = A_LEFT
+            elif align == "right":
+                self.Flush()
+                self.align = A_RIGHT
+            elif align == "center":
+                self.Flush()
+                self.align = A_CENTER
+            elif align == "fill":
+                self.Flush()
+                self.align = A_FILL
+            elif align == "as_is":
+                self.Flush()
+                self.align = A_AS_IS          
+        else:
+            print("Invalid align type", line)
 
     def CmdPar(self, line):
         pass
