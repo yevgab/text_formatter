@@ -106,6 +106,11 @@ class TextFormat():
         else:
             self.prev_line = line
 
+    def empty_line(self, line):
+        for el in range(self.interval + 2):
+            print(" ")
+
+
     def LineAlign(self, s, normal_str = True):
         if normal_str:
             ln = self.w - self.offset[0] - self.offset[1]
@@ -243,7 +248,7 @@ class TextFormat():
         else:
             cmd = "Unknown Command"
             print("Command found:", cmd)
-
+            self.empty_line(line)
         
     def CmdSize(self, line):
         pass
@@ -269,6 +274,7 @@ class TextFormat():
                 self.align = A_AS_IS          
         else:
             print("Invalid align type", line)
+            self.empty_line(line)
 
     def CmdPar(self, line):
         pass
@@ -301,6 +307,7 @@ class TextFormat():
                 self.PageClose()
         else:
             print("Invalid left command", line)
+            self.empty_line(line)
 
     def CmdHeader(self, line):
         pass
