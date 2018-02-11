@@ -289,7 +289,18 @@ class TextFormat():
         self.PageClose()
 
     def CmdLeft(self, line):
-        pass
+        self.Flush()
+        m = re.match(r"^\?left\ +(\d+){1}", line)
+        if m != None:
+            try:
+                ll = int(m.group(1))
+            except ValueError as err:
+                print("Invalid left parameter", line, err)
+                return
+            if ll > self.left:
+                self.PageClose()
+        else:
+            print("Invalid left command", line)
 
     def CmdHeader(self, line):
         pass
