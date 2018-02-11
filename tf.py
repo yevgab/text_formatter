@@ -298,7 +298,7 @@ class TextFormat():
         pass
 
     def CmdBr(self, line):
-        pass
+        self.Flush()
 
     def CmdFootnote(self, line):
         pass
