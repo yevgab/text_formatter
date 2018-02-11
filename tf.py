@@ -286,7 +286,7 @@ class TextFormat():
         pass
 
     def CmdPageBreak(self, line):
-        pass
+        self.PageClose()
 
     def CmdLeft(self, line):
         pass
