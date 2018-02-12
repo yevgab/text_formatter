@@ -73,8 +73,7 @@ class TextFormat():
             self.fn_lines -= 1
             return
         if self.align == A_AS_IS:
-            print(line)
-            self.left -= 1
+            self.PrintLine(line, False)
             return
 
         line = line.strip()
@@ -90,7 +89,7 @@ class TextFormat():
         while len(line) >= cw:
             s, line = self.LineCut(line, cw)
             if s == "":
-                print(line)
+                self.PrintLine(line, False)
                 break
             # Отформатировать строку в соответствии с текущими 
             # настройками выравнивания
@@ -98,18 +97,28 @@ class TextFormat():
             # Вывести строку в стандартный вывод
             self.first_line = False
             cw = self.w - self.offset[0] - self.offset[1]
-            print(s)
-            self.left -= 1
-            if self.left == 0:
-                self.prev_line = line
-                break
+            self.PrintLine(s)
+
         else:
             self.prev_line = line
 
-    def empty_line(self, line):
-        for el in range(self.interval + 2):
-            print(" ")
+    def PrintLine(self, line, add_interval = True):
+        if self.left == 0:
+            self.PageClose()
 
+        print(line)
+        self.left -= 1
+        if add_interval:
+            for l in range(self.interval - 1):
+                if self.left > 0:
+                    print("")
+                    self.left -= 1
+
+    def PrintErr(self, line):
+        print(line)
+
+    def PrintSym(self, sym):
+        print(sym)
 
     def LineAlign(self, s, normal_str = True):
         if normal_str:
@@ -179,7 +188,7 @@ class TextFormat():
         pass
 
     def PageClose(self, not_start_new_page = False):
-        print('\f')
+        self.PrintSym('\f')
         self.left = self.h
         if not not_start_new_page:
             self.PageInit()
@@ -199,9 +208,9 @@ class TextFormat():
             self.PageClose()
 
         if self.align == A_CENTER or self.align == A_RIGHT:
-            print(self.LineAlign(self.prev_line))
+            self.PrintLine(self.LineAlign(self.prev_line))
         else:
-            print(self.prev_line)
+            self.PrintLine(self.prev_line)
         
         self.prev_line = ""
         self.first_line = True
@@ -246,9 +255,7 @@ class TextFormat():
                 self.CmdAlias(line)
                 
         else:
-            cmd = "Unknown Command"
-            print("Command found:", cmd)
-            self.empty_line(line)
+            self.PrintErr("Unknown command: " + cmd)
         
     def CmdSize(self, line):
         pass
@@ -273,8 +280,7 @@ class TextFormat():
                 self.Flush()
                 self.align = A_AS_IS          
         else:
-            print("Invalid align type", line)
-            self.empty_line(line)
+            self.PrintErr("Invalid align type: " + line)
 
     def CmdPar(self, line):
         pass
@@ -301,13 +307,13 @@ class TextFormat():
             try:
                 ll = int(m.group(1))
             except ValueError as err:
-                print("Invalid left parameter", line, err)
+                self.PrintErr("Invalid left parameter in command [" + line
+                    + "] :" + err)
                 return
             if ll > self.left:
                 self.PageClose()
         else:
-            print("Invalid left command", line)
-            self.empty_line(line)
+            self.PrintErr("Invalid left command: " + line)
 
     def CmdHeader(self, line):
         pass
