@@ -168,15 +168,6 @@ class TextFormat():
                 
         return s
 
-    def Offset(self, s):
-        if self.offset[0] != 0:
-            s = " " * self.offset[0] + s
-        if self.offset[1] != 0:
-            s += " " * self.offset[1]
-
-    def Interval(self, s):
-        s += "\n" * (self.interval - 1) 
-
     def LineCut(self, line, cw):
         # Отрезать от строки подстроку шириной не более текущей ширины
         # параграфа по пробелам
@@ -219,7 +210,8 @@ class TextFormat():
         if self.align == A_CENTER or self.align == A_RIGHT:
             self.PrintLine(self.LineAlign(self.prev_line))
         else:
-            self.PrintLine(self.prev_line)
+            self.PrintLine(self.prev_line.rjust(len(self.prev_line) 
+                + self.offset[0]))
         
         self.prev_line = ""
         self.first_line = True
