@@ -168,6 +168,12 @@ class TextFormat():
                 
         return s
 
+    def Offset(self, s, offset_l, offset_r):
+        if self.offset[0] != 0:
+            s = " " * self.offset[0] + s
+        if self.offset[1] != 0:
+            s += " " * self.offset[1]
+
     def LineCut(self, line, cw):
         # Отрезать от строки подстроку шириной не более текущей ширины
         # параграфа по пробелам
@@ -204,7 +210,7 @@ class TextFormat():
         return line
 
     def Flush(self, close_document = False):
-        if self.left == 0:
+        if self.left - self.interval == 0:
             self.PageClose()
 
         if self.align == A_CENTER or self.align == A_RIGHT:
@@ -286,7 +292,20 @@ class TextFormat():
         pass
 
     def CmdOffset(self, line):
-        pass
+        m = re.match(r"^\?offset\ + \d", line)
+        n = re.match(r"^\?offset\ + \,\ + \d", line)
+        if m != None:
+            self.offset[0] = int(m.group(1))
+            #kill me please
+            #tried converting to the string of having variables assigned
+            #doesn't work
+            self.Flush
+            self.Offset
+        if n != None:
+            self.offset[1] = int(n.group(1))
+            #same for this one
+            self.Flush
+            self.Offset
 
     def CmdInterval(self, line):
         pass
