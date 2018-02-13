@@ -295,27 +295,39 @@ class TextFormat():
         pass
 
     def CmdOffset(self, line):
-        m = re.match(r"^\?offset\ + \d", line)
-        n = re.match(r"^\?offset\ + \,\ + \d", line)
+        m = re.match(r"^\?offset\ +(\d+)?,(\d+)?", line)
         if m != None:
-            self.offset[0] = int(m.group(1))
-            #kill me please
-            #tried converting to the string of having variables assigned
-            #doesn't work
-            self.Flush
-            self.Offset
-        if n != None:
-            self.offset[1] = int(n.group(1))
-            #same for this one
-            self.Flush
-            self.Offset
+            self.Flush()
+            if m.group(1) != None:
+                try:
+                    off = int(m.group(1))
+                    if off > 0 and off < int(self.w / 3):
+                        self.offset = (off, self.offset[1])
+                except ValueError as err:
+                    self.PrintErr("Invalid left offset value " + m.group(1) +" : " + err)
+            if m.group(2) != None:
+                try:
+                    off = int(m.group(2))
+                    if off > 0 and off < int(self.w / 3):
+                        self.offset = (self.offset[0], off)
+                except ValueError as err:
+                    self.PrintErr("Invalid right offset value " + m.group(1) + " : " + err)
+        else:
+            self.PrintErr("Invalid offset command [" + line + "]")
 
     def CmdInterval(self, line):
-        m = re.match(r"^\?interval\ +\d{1}", line)
-        self.interval = m.group(1)
+        m = re.match(r"^\?interval\ +(\d+){1}", line)
         if m != None:
-            self.Flush
-            self.Interval
+            try:
+                newInt = int(m.group(1))
+            except ValueError as err:
+                self.PrintErr("Could not get an interval parameter due to " + err)
+                return
+            self.Flush()
+            if newInt >= 0 and newInt != self.interval:
+                self.interval = newInt
+        else:
+            self.PrintErr("Invalid interval command [" + line + "]")
 
     def CmdFeed(self, line):
         pass
