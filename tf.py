@@ -84,6 +84,7 @@ class TextFormat():
         line = self.prev_line + ' ' + line
         cw = self.w - self.offset[0] - self.offset[1]
         if self.first_line:
+            self.FeedLines(self.space[0])
             cw += self.indent
        
         while len(line) >= cw:
@@ -203,8 +204,17 @@ class TextFormat():
             line = line[:pos]
         return line
 
+    def FeedLines(self, n, add_interval = True):
+        for i in range(n):
+            if self.left > 0:
+                self.PrintLine("", False)
+                self.left -= 1
+            if add_interval and self.left > 0:
+                self.PrintLine("", False)
+                self.left -= 1
+
     def Flush(self, close_document = False):
-        if self.left - (self.interval - 1) == 0:
+        if self.left == 0:
             self.PageClose()
 
         if self.align == A_CENTER or self.align == A_RIGHT:
@@ -214,6 +224,7 @@ class TextFormat():
                 + self.offset[0]))
         
         self.prev_line = ""
+        self.FeedLines(self.space[1])
         self.first_line = True
 
         if close_document:
@@ -287,20 +298,20 @@ class TextFormat():
         pass
 
     def CmdOffset(self, line):
-        m = re.match(r"^\?offset\ +(\d+)?,(\d+)?", line)
+        m = re.match(r"^\?offset\ +(\d+)?,\ *(\d+)?", line)
         if m != None:
             self.Flush()
             if m.group(1) != None:
                 try:
                     off = int(m.group(1))
-                    if off > 0 and off < int(self.w / 3):
+                    if off >= 0 and off < int(self.w / 3):
                         self.offset = (off, self.offset[1])
                 except ValueError as err:
                     self.PrintErr("Invalid left offset value " + m.group(1) +" : " + err)
             if m.group(2) != None:
                 try:
                     off = int(m.group(2))
-                    if off > 0 and off < int(self.w / 3):
+                    if off >= 0 and off < int(self.w / 3):
                         self.offset = (self.offset[0], off)
                 except ValueError as err:
                     self.PrintErr("Invalid right offset value " + m.group(1) + " : " + err)
@@ -322,10 +333,32 @@ class TextFormat():
             self.PrintErr("Invalid interval command [" + line + "]")
 
     def CmdFeed(self, line):
-        pass
+        m = re.match(r"^\?feed\ +(\d+){1}", line)
+        if m != None:
+            try:
+                n = int(m.group(1))
+            except ValueError as err:
+                self.PrintErr("Could not get a feed parameter due to " + err)
+                return
+            self.Flush()
+            if n >= 0 and n < int(self.h/3):
+                self.FeedLines(n)
+        else:
+            self.PrintErr("Invalid feed command [" + line + "]")
 
     def CmdFeedLines(self, line):
-        pass
+        m = re.match(r"^\?feed_lines\ +(\d+){1}", line)
+        if m != None:
+            try:
+                n = int(m.group(1))
+            except ValueError as err:
+                self.PrintErr("Could not get a feed lines parameter due to " + err)
+                return
+            self.Flush()
+            if n >= 0 and n < int(self.h/3):
+                self.FeedLines(n, False)
+        else:
+            self.PrintErr("Invalid feed lines command [" + line + "]")
 
     def CmdPageBreak(self, line):
         self.PageClose()

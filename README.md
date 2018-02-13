@@ -5,7 +5,7 @@
 Command list:
 
     ?size w,h
-            -sets new page size, closes current page and starts a new one
+            -sets new page size, closes current page and starts a new one (Enes)
     
     ?align fill|left|right|center|as_is
             -sets new paragraph alignment; closes current paragraph and starts 
@@ -13,7 +13,7 @@ Command list:
 
     ?par <space_up>,<space_down>,<indent>
             -sets paragraphs characteristics; closes current paragraph and
-             starts a new one
+             starts a new one (jane)
 
     ?offset <left>,<right>
             -sets paragraphs characteristics; closes current paragraph and
@@ -39,10 +39,10 @@ Command list:
              then starts new page
 
     ?header <height>, <pos>, left|right|center|smart, top|bottom, <format>
-            -creates a header based on specifications
+            -creates a header based on specifications (Lily)
 
     ?p_num <num>, arabic|roman|letter, <prefix>
-            -sets new page number
+            -sets new page number (Lily)
 
     ?br
             -closes current paragraph and starts a new one
