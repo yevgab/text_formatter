@@ -35,6 +35,8 @@ PNUM_ARABIC = 0
 PNUM_ROMAN  = 1
 PNUM_LETTER = 2
 
+MIN_PAGE_SIZE = (20, 20) # h, w
+
 
 
 
@@ -116,7 +118,9 @@ class TextFormat():
                     self.left -= 1
 
     def PrintErr(self, line):
-        print(line)
+        print("")
+        print("  >>> ERROR: " + line)
+        print("")
 
     def PrintSym(self, sym):
         print(sym)
@@ -139,25 +143,26 @@ class TextFormat():
         elif self.align == A_FILL:
             # Разбить строку на слова
             ww = s.split()
-            # Посчитать суммарную длину всех слов
-            wln = 0
-            for w in ww:
-                wln += len(w)
-            # Определить минимальное количество пробелов в строке
-            min_s = int((ln - wln) / (len(ww) - 1))
-            # Расставить в случайные позиции оставшиеся пробелы
-            sp = ln - wln - min_s * (len(ww) - 1)
-            spp = set()
-            while sp > 0:
-                sppl = len(spp)
-                spp.add(random.randint(0, len(ww) - 2))
-                if len(spp) > sppl:
-                    sp -= 1
-            s = ww[0]
-            for p, w in enumerate(ww[1:]):
-                if p in spp:
-                    s += " "
-                s += w.rjust(len(w) + min_s)
+            if len(ww) > 1:
+                # Посчитать суммарную длину всех слов
+                wln = 0
+                for w in ww:
+                    wln += len(w)
+                # Определить минимальное количество пробелов в строке
+                min_s = int((ln - wln) / (len(ww) - 1))
+                # Расставить в случайные позиции оставшиеся пробелы
+                sp = ln - wln - min_s * (len(ww) - 1)
+                spp = set()
+                while sp > 0:
+                    sppl = len(spp)
+                    spp.add(random.randint(0, len(ww) - 2))
+                    if len(spp) > sppl:
+                        sp -= 1
+                s = ww[0]
+                for p, w in enumerate(ww[1:]):
+                    if p in spp:
+                        s += " "
+                    s += w.rjust(len(w) + min_s)
 
 
         if normal_str:
@@ -270,7 +275,41 @@ class TextFormat():
             self.PrintErr("Unknown command: " + cmd)
         
     def CmdSize(self, line):
-        pass
+        m = re.match(r"^\?size\ +(\d+)?,\ *(\d+)?", line)
+        if m != None:
+            if m.group(1) != None:
+                h = int(m.group(1))
+                if h < MIN_PAGE_SIZE[0]:
+                    self.PrintErr("Page height coudn't be less than " + str(MIN_PAGE_SIZE[0]))
+                    h = self.h
+            else:
+                h = self.h
+            if m.group(2) != None:
+                w = int(m.group(2))
+                if w < MIN_PAGE_SIZE[1]:
+                    self.PrintErr("Page width coudn't be less than " + str(MIN_PAGE_SIZE[1]))
+                    w = self.w
+            else:
+                w = self.w
+            if self.left > 0:
+                self.Flush()
+                flushed = True
+            else:
+                flushed = False
+            # Сравнить новые размеры с текущими размерами
+            # Если новые размеры меньше чем текущие,
+            if h < self.h or w < self.w:
+                # то закрываем абзац, если есть свободное место
+                # и закрываем страницу, и открывем новую.
+                self.PageClose(False)
+                self.h, self.w = h, w
+                self.PageInit()
+            else:
+                self.h, self.w = h, w
+            if not flushed:
+                self.Flush()
+        else:
+            self.PrintErr("Invalid size command: " + line)
     
     def CmdAlign(self, line):
         m = re.match(r"^\?align\ +(left|right|center|fill|as_is){1}", line)
