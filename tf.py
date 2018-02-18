@@ -49,7 +49,7 @@ class TextFormat():
         self.header_pos = H_NONE
         self.indent = 0
         self.offset = (0, 0)
-        self.space = (0, 0)
+        self.space = 0
         self.interval = 1
         self.pnum_type = PNUM_ARABIC
         self.pnum = 1
@@ -86,7 +86,7 @@ class TextFormat():
         line = self.prev_line + ' ' + line
         cw = self.w - self.offset[0] - self.offset[1]
         if self.first_line:
-            self.FeedLines(self.space[0])
+        #    self.FeedLines(self.space)
             cw += self.indent
        
         while len(line) >= cw:
@@ -213,10 +213,8 @@ class TextFormat():
         for i in range(n):
             if self.left > 0:
                 self.PrintLine("", False)
-                self.left -= 1
             if add_interval and self.left > 0:
-                self.PrintLine("", False)
-                self.left -= 1
+                self.PrintLine("")
 
     def Flush(self, close_document = False):
         if self.left == 0:
@@ -229,7 +227,7 @@ class TextFormat():
                 + self.offset[0]))
         
         self.prev_line = ""
-        self.FeedLines(self.space[1])
+        self.FeedLines(self.space)
         self.first_line = True
 
         if close_document:
@@ -334,7 +332,20 @@ class TextFormat():
             self.PrintErr("Invalid align type: " + line)
 
     def CmdPar(self, line):
-        pass
+        m = re.match(r"^\?par\ +(\d+)?,\ *(-?\d+)?", line)
+        if m != None:
+            self.Flush()
+            if m.group(1) != None:
+                sp = int(m.group(1))
+                if sp >= 0 and sp <= int(self.h/2):
+                    self.space = sp
+            if m.group(2) != None:
+                ind = int(m.group(2))
+                if (ind >= 0 and ind <= int(self.w/6)) or (ind < 0 and abs(ind) <= self.offset[0]):
+                    self.indent = ind
+            #needs fixing 
+            #indent is not stable across lines
+
 
     def CmdOffset(self, line):
         m = re.match(r"^\?offset\ +(\d+)?,\ *(\d+)?", line)

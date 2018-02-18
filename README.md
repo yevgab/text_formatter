@@ -11,7 +11,7 @@ Command list:
             -sets new paragraph alignment; closes current paragraph and starts 
              a new one
 
-    ?par <space_up>,<space_down>,<indent>
+    ?par <space>,<indent>
             -sets paragraphs characteristics; closes current paragraph and
              starts a new one (jane)
 
