@@ -26,8 +26,8 @@ H_LEFT   = 0
 H_RIGHT  = 1
 H_CENTER = 2
 H_SMART  = 3
-H_TOP    = 4
-H_BOTTOM = 5
+HV_TOP    = 4
+HV_BOTTOM = 5
 H_NONE   = -1
 
 # arabic|roman|letter
@@ -45,8 +45,11 @@ class TextFormat():
         self.w = w
         self.h = h
         self.left = self.h
-        self.align = A_FILL
-        self.header_pos = H_NONE
+        self.align = A_LEFT
+        self.header_hpos = H_NONE
+        self.header_vpos = H_NONE
+        self.header_h = 0
+        self.header_pos = 0
         self.indent = 0
         self.offset = (0, 0)
         self.space = 0
@@ -83,11 +86,12 @@ class TextFormat():
             self.Flush()
             return
 
-        line = self.prev_line + ' ' + line
+        if self.prev_line != "":
+            line = self.prev_line + ' ' + line 
         cw = self.w - self.offset[0] - self.offset[1]
         if self.first_line:
         #    self.FeedLines(self.space)
-            cw += self.indent
+            cw -= self.indent
        
         while len(line) >= cw:
             s, line = self.LineCut(line, cw)
@@ -220,11 +224,7 @@ class TextFormat():
         if self.left == 0:
             self.PageClose()
 
-        if self.align == A_CENTER or self.align == A_RIGHT:
-            self.PrintLine(self.LineAlign(self.prev_line))
-        else:
-            self.PrintLine(self.prev_line.rjust(len(self.prev_line) 
-                + self.offset[0]))
+        self.PrintLine(self.LineAlign(self.prev_line))
         
         self.prev_line = ""
         self.FeedLines(self.space)

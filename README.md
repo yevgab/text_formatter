@@ -13,7 +13,7 @@ Command list:
 
     ?par <space>,<indent>
             -sets paragraphs characteristics; closes current paragraph and
-             starts a new one (jane)
+             starts a new one
 
     ?offset <left>,<right>
             -sets paragraphs characteristics; closes current paragraph and
@@ -38,11 +38,11 @@ Command list:
             -closes current paragraph; checks if <num> lines are left on page,
              then starts new page
 
-    ?header <height>, <pos>, left|right|center|smart, top|bottom, <format>
-            -creates a header based on specifications (Lily)
-
+    ?header <height>, <pos>, left|right|center|smart, top|bottom
+            -creates a header based on specifications
+        
     ?p_num <num>, arabic|roman|letter, <prefix>
-            -sets new page number (Lily)
+            -sets new page number
 
     ?br
             -closes current paragraph and starts a new one
