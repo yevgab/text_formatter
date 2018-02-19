@@ -49,6 +49,8 @@ class TextFormat():
         self.header_hpos = H_NONE
         self.header_vpos = H_NONE
         self.header_h = 0
+        # header_pos determines the line from header_h in which the header 
+        # will be displayed
         self.header_pos = 0
         self.indent = 0
         self.offset = (0, 0)
@@ -429,7 +431,40 @@ class TextFormat():
             self.PrintErr("Invalid left command: " + line)
 
     def CmdHeader(self, line):
-        pass
+        m = re.match(r"^\?header\ +(\d+){1},\ *(\d+){1},\ *(left|right|center|smart){1},\ \
+        *(top|bottom){1},\ *(.*)", line)
+        normal_str = False
+        if m != None:
+            try:
+                self.header_h = int(m.group(1))
+            except ValueError as err:
+                self.PrintErr("Could not get a header hight parameter due to " + err)
+                return
+
+            try:
+                if m.group(2) >= 1 and m.group(2) <= self.header_h:
+                    self.header_hpos = m.group(2)
+                else:
+                    self.header_hpos = 1
+                    print("Your header position is outside of header boundaries")
+            except ValueError as err:
+                self.PrintErr("Could not get a header position hight parameter due to " + err)
+                return
+
+            header = m.group(5)
+            if m.group(3) == "right":
+                header = header.rjust(self.w - self.offset[0] - self.offset[1])
+            elif m.group(3) == "center":
+                header = header.center(self.w - self.offset[0] - self.offset[1])
+            elif m.group(3) == "smart":
+                if self.pnum % 2 != 0:
+                    header = header.rjust(self.w - self.offset[0] - self.offset[1])
+                    
+
+            if m.group(4) == "top":
+                pass
+                
+            
 
     def CmdPNum(self, line):
         pass

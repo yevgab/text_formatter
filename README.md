@@ -38,7 +38,7 @@ Command list:
             -closes current paragraph; checks if <num> lines are left on page,
              then starts new page
 
-    ?header <height>, <pos>, left|right|center|smart, top|bottom
+    ?header <height>, <pos>, left|right|center|smart, top|bottom, header content
             -creates a header based on specifications
         
     ?p_num <num>, arabic|roman|letter, <prefix>
