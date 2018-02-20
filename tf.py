@@ -52,6 +52,7 @@ class TextFormat():
         # header_pos determines the line from header_h in which the header 
         # will be displayed
         self.header_pos = 0
+        self.header_text = ""
         self.indent = 0
         self.offset = (0, 0)
         self.space = 0
@@ -180,6 +181,43 @@ class TextFormat():
                 
         return s
 
+    def HeaderForm(self):
+        if self.header_hpos == H_NONE or self.header_h == 0:
+            return
+        
+        if self.header_vpos == HV_BOTTOM:
+            print("="*self.w)
+
+        if self.header_text != "":
+            h = self.header_text + " "
+        else:
+            h = ""
+
+        h += self.GetPNum()
+
+        if self.header_hpos == H_RIGHT:
+            h = h.rjust(self.w)
+        elif self.header_hpos == H_CENTER:
+            h = h.center(self.w)
+        elif self.header_hpos == H_SMART:
+            if self.pnum % 2 == 0:
+                h = h.rjust(self.w)
+        
+        for i in range(self.header_h):
+            if i + 1 == self.header_pos:
+                print(h)
+            else:
+                print("")
+        
+        if self.header_vpos == HV_TOP:
+            print("="*self.w)
+        
+
+        
+    def GetPNum(self):
+        return str(self.pnum)
+        
+
     def LineCut(self, line, cw):
         # Отрезать от строки подстроку шириной не более текущей ширины
         # параграфа по пробелам
@@ -201,8 +239,13 @@ class TextFormat():
 
     def PageClose(self, not_start_new_page = False):
         self.PrintSym('\f')
-        self.left = self.h
+        self.left = self.h - self.header_h - 1
+        if self.header_vpos == HV_BOTTOM:
+            self.HeaderForm()
+        self.pnum += 1
         if not not_start_new_page:
+            if self.header_vpos == HV_TOP:
+                self.HeaderForm()
             self.PageInit()
         
 
@@ -431,41 +474,44 @@ class TextFormat():
             self.PrintErr("Invalid left command: " + line)
 
     def CmdHeader(self, line):
-        m = re.match(r"^\?header\ +(\d+){1},\ *(\d+){1},\ *(left|right|center|smart){1},\ \
-        *(top|bottom){1},\ *(.*)", line)
-        normal_str = False
+        m = re.match(r"^\?header\ +(\d+){1},\ *(\d+){1},\ *(left|right|center|smart){1},\ *(top|bottom){1},\ *(.*)", line)
         if m != None:
             try:
-                self.header_h = int(m.group(1))
+                hh = int(m.group(1))
+                if hh <= 5:
+                    self.header_h = hh
+                else:
+                    self.PrintErr("Header height is out of bounds")
             except ValueError as err:
-                self.PrintErr("Could not get a header hight parameter due to " + err)
+                self.PrintErr("Could not get a header height parameter due to " + err)
                 return
 
             try:
-                if m.group(2) >= 1 and m.group(2) <= self.header_h:
-                    self.header_hpos = m.group(2)
+                hp = int(m.group(2))
+                if hp >= 1 and hp <= self.header_h:
+                    self.header_pos = hp
                 else:
-                    self.header_hpos = 1
-                    print("Your header position is outside of header boundaries")
+                    self.header_pos = 1
+                    self.PrintErr("Your header position is outside of header boundaries")
             except ValueError as err:
                 self.PrintErr("Could not get a header position hight parameter due to " + err)
                 return
 
-            header = m.group(5)
+            self.header_text = m.group(5)
             if m.group(3) == "right":
-                header = header.rjust(self.w - self.offset[0] - self.offset[1])
+                self.header_hpos = H_RIGHT
             elif m.group(3) == "center":
-                header = header.center(self.w - self.offset[0] - self.offset[1])
+                self.header_hpos = H_CENTER
             elif m.group(3) == "smart":
-                if self.pnum % 2 != 0:
-                    header = header.rjust(self.w - self.offset[0] - self.offset[1])
-                    
+                self.header_hpos = H_SMART
+            elif m.group(3) == "left":
+                self.header_hpos = H_LEFT
 
             if m.group(4) == "top":
-                pass
-                
+                self.header_vpos = HV_TOP
+            else:
+                self.header_vpos = HV_BOTTOM
             
-
     def CmdPNum(self, line):
         pass
 
