@@ -58,6 +58,35 @@ RM_DIG = {
     1000:"M"
 }
 
+LET_DIG = { 
+    1:"a",
+    2:"b",
+    3:"c",
+    4:"d",
+    5:"e",
+    6:"f",
+    7:"g",
+    8:"h",
+    9:"i",
+    10:"j",
+    11:"k",
+    12:"l",
+    13:"m",
+    14:"n",
+    15:"o",
+    16:"p",
+    17:"q",
+    18:"r",
+    19:"s",
+    20:"t",
+    21:"u",
+    22:"v",
+    23:"w",
+    24:"x",
+    25:"y",
+    26:"z" 
+}
+
 
 class TextFormat():
     def __init__(self, w = 72, h = 40):
@@ -264,7 +293,25 @@ class TextFormat():
                     pn += RM_DIG[en]
             
         elif self.pnum_type == PNUM_LETTER:
-            pass
+            if self.pnum > 17602:
+                self.PrintErr("Page number is too large for letter style" + str(self.pnum))
+                pn - "<TOO LARGE>"
+            elif self.pnum == 0:
+                pn = int(self.pnum)
+            else:
+                if self.pnum < 27:
+                    pn = LET_DIG[self.pnum]
+                else:
+                    aa = self.pnum // 26
+                    left = self.pnum - aa * 26
+                    if aa < 27:
+                        pn = LET_DIG[aa] + LET_DIG[left]
+                    else:
+                        bb = aa // 26
+                        aa -= bb * 26
+                        left = self.pnum - aa*26 - bb*26**2
+                        pn = LET_DIG[bb] + LET_DIG[aa] + LET_DIG[left]
+
         if self.pnum_prefix != "":
             pn = self.pnum_prefix + ' ' + pn
         return pn
