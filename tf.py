@@ -240,6 +240,29 @@ class TextFormat():
             if self.pnum > 3999:
                 self.PrintErr("Page number is too large for roman style " + str(self.pnum))
                 pn = "<TOO LARGE>"
+            else:
+                th = self.pnum // 1000
+                hd = (self.pnum - th * 1000) // 100
+                dc = (self.pnum - th * 1000 - hd * 100) // 10
+                en = (self.pnum - th * 1000 - hd * 100 - dc * 10)
+                pn = RM_DIG[1000]*th
+                if hd*100 in RM_DIG:
+                    pn += RM_DIG[hd * 100]
+                else:
+                    if hd > 5:
+                        pn += RM_DIG[500] + RM_DIG[100]*(hd - 5)
+                    else:
+                        pn += RM_DIG[100] * hd
+                if dc*10 in RM_DIG:
+                    pn += RM_DIG[dc * 10]
+                else:
+                    if dc > 5:
+                        pn += RM_DIG[50] + RM_DIG[10]*(dc - 5)
+                    else:
+                        pn += RM_DIG[10] * dc
+                if en != 0:
+                    pn += RM_DIG[en]
+            
         elif self.pnum_type == PNUM_LETTER:
             pass
         if self.pnum_prefix != "":
