@@ -513,7 +513,16 @@ class TextFormat():
                 self.header_vpos = HV_BOTTOM
             
     def CmdPNum(self, line):
-        pass
+        m = re.match(r"^\?p_num\ +(\d+)?,\ *(arabic|roman|letter){1},\ *(.*)", line)
+        if m != None:
+            self.pnum = int(m.group(1))
+            if m.group(2) == "arabic":
+                self.pnum_type = PNUM_ARABIC
+            elif m.group(2) == "roman":
+                self.pnum_type = PNUM_ROMAN
+            elif m.group(2) == "letter":
+                self.pnum_type = PNUM_LETTER
+            self.pnum_prefix = m.group(3)
 
     def CmdBr(self, line):
         self.Flush()
