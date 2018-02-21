@@ -37,7 +37,26 @@ PNUM_LETTER = 2
 
 MIN_PAGE_SIZE = (20, 20) # h, w
 
-
+RM_DIG = {
+    1:"I",
+    2:"II",
+    3:"III",
+    4:"IV",
+    5:"V",
+    6:"VI",
+    7:"VII",
+    8:"VIII",
+    9:"IX",
+    10:"X",
+    40:"XL",
+    50:"L",
+    90:"XC",
+    100:"C",
+    400:"CD",
+    500:"D",
+    900:"CM",
+    1000:"M"
+}
 
 
 class TextFormat():
@@ -215,7 +234,17 @@ class TextFormat():
 
         
     def GetPNum(self):
-        return str(self.pnum)
+        if self.pnum_type == PNUM_ARABIC:
+            pn = str(self.pnum)
+        elif self.pnum_type == PNUM_ROMAN:
+            if self.pnum > 3999:
+                self.PrintErr("Page number is too large for roman style " + str(self.pnum))
+                pn = "<TOO LARGE>"
+        elif self.pnum_type == PNUM_LETTER:
+            pass
+        if self.pnum_prefix != "":
+            pn = self.pnum_prefix + ' ' + pn
+        return pn
         
 
     def LineCut(self, line, cw):
