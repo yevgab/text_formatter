@@ -161,6 +161,11 @@ class TextFormat():
             self.prev_line = line
 
     def PrintLine(self, line, add_interval = True):
+        """
+        Adds lines
+
+        Adds lines and adds interval
+        """
         if self.left == 0:
             self.PageClose()
 
@@ -173,6 +178,11 @@ class TextFormat():
                     self.left -= 1
 
     def PrintErr(self, line):
+        """
+        Writes error
+
+
+        """
         print("")
         print("  >>> ERROR: " + line)
         print("")
@@ -263,6 +273,11 @@ class TextFormat():
 
         
     def GetPNum(self):
+        """
+        Gets page number
+
+
+        """
         if self.pnum_type == PNUM_ARABIC:
             pn = str(self.pnum)
         elif self.pnum_type == PNUM_ROMAN:
@@ -318,6 +333,11 @@ class TextFormat():
         
 
     def LineCut(self, line, cw):
+        """
+        Cuts a lines
+
+
+        """
         # Отрезать от строки подстроку шириной не более текущей ширины
         # параграфа по пробелам
         
@@ -337,6 +357,11 @@ class TextFormat():
         pass
 
     def PageClose(self, not_start_new_page = False):
+        """
+        Closes page
+
+        Closes page and start new page
+        """
         self.PrintSym('\f')
         self.left = self.h - self.header_h - 1
         if self.header_vpos == HV_BOTTOM:
@@ -381,6 +406,11 @@ class TextFormat():
         pass
         
     def ProcessCommand(self, line):
+        """
+        Calling commands
+
+
+        """
         m = re.match(r"^\?(\w+)\ +.*", line)
         if m != None:
             cmd = m.group(1)
