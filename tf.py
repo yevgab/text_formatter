@@ -37,6 +37,9 @@ PNUM_LETTER = 2
 
 MIN_PAGE_SIZE = (20, 20) # h, w
 
+FN_OFFSET = 5
+FN_INDENT = -FN_OFFSET
+
 RM_DIG = {
     1:"I",
     2:"II",
@@ -113,10 +116,14 @@ class TextFormat():
         self.fn_lines = 0
         self.fn_w = self.w
         self.fn = []
+        self.fn_first = True
+        self.fn_lpp = 0
+        self.fn_prev = ""
+        self.fn_index = 1
 
     def ProcessLine(self, line):
         line = self.RemoveCRLF(line)
-        if re.match(r"^\?\w+\ +.*", line) != None:
+        if re.match(r"^\?\w+\ +.*", line) != None and self.fn_lines == 0:
             self.ProcessCommand(line)
         else:
             self.FormatLine(line)
@@ -126,7 +133,6 @@ class TextFormat():
     def FormatLine(self, line):
         if self.fn_lines > 0:
             self.FormatFNLine(line)
-            self.fn_lines -= 1
             return
         if self.align == A_AS_IS:
             self.PrintLine(line, False)
@@ -186,8 +192,9 @@ class TextFormat():
             if self.first_line:
                 ln -= self.indent
         else:
-            # TODO: calculate ln for footnotes (flag normal_str as false)
-            pass
+            ln = self.fn_w - FN_OFFSET
+            if self.fn_first:
+                ln -= FN_INDENT
 
         if self.align == A_RIGHT:
             s = s.rjust(ln)
@@ -226,6 +233,12 @@ class TextFormat():
                 s = s.rjust(ln + self.offset[0] + self.indent)
             else:
                 s = s.rjust(ln + self.offset[0])
+        else:
+            if self.fn_first:
+                s = s.rjust(ln + FN_OFFSET + FN_INDENT)
+            else:
+                s = s.rjust(ln + FN_OFFSET)
+            
                 
         return s
 
@@ -295,7 +308,7 @@ class TextFormat():
         elif self.pnum_type == PNUM_LETTER:
             if self.pnum > 17602:
                 self.PrintErr("Page number is too large for letter style" + str(self.pnum))
-                pn - "<TOO LARGE>"
+                pn = "<TOO LARGE>"
             elif self.pnum == 0:
                 pn = int(self.pnum)
             else:
@@ -331,7 +344,44 @@ class TextFormat():
         return s, line
               
     def FormatFNLine(self, line):
-        pass
+        if len(line) == 0:
+            return
+
+        self.fn_lines -= 1 
+        cw = self.fn_w - FN_OFFSET
+
+        if self.fn_first:
+            cw -= FN_INDENT
+       
+        if self.fn_prev != "":
+            line = self.fn_prev + " " + line
+
+        while len(line) >= cw:
+            s, line = self.LineCut(line, cw)
+            if s == "":
+                self.PrintLine(line, False)
+                break
+            # Отформатировать строку в соответствии с текущими 
+            # настройками выравнивания
+            s = self.LineAlign(s, cw)
+            # Вывести строку в стандартный вывод
+            self.fn_first = False
+            cw = self.w - FN_OFFSET
+            self.fn.insert(0,self.LineAlign(line, False))
+            self.fn_first = True
+            if self.left > 0:
+                self.left -= 1
+                self.fn_lpp += 1 
+
+        else:
+            if self.fn_lines == 0:
+                self.fn.insert(0,self.LineAlign(line, False))
+                self.fn_first = True
+                if self.left > 0:
+                    self.left -= 1
+                    self.fn_lpp += 1 
+            else:
+                self.fn_prev = line 
 
     def PageInit(self):
         pass
@@ -627,7 +677,16 @@ class TextFormat():
         self.Flush()
 
     def CmdFootnote(self, line):
-        pass
+        m = re.match(r"^\?footnote\ +(\d+){1}", line)
+        if m != None:
+            self.fn_lines = int(m.group(1))
+            self.prev_line += "[" + str(self.fn_index) + "]"
+            if (self.fn_index == 1 and self.left < 3) or (self.left < 2):
+                self.PageClose()
+            else:
+                if self.fn_index == 1:
+                    self.fn.insert(0,"-"*self.fn_w)
+                    self.left -= 1   
 
     def CmdAlias(self, line):
         pass  
