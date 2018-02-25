@@ -167,6 +167,11 @@ class TextFormat():
             self.prev_line = line
 
     def PrintLine(self, line, add_interval = True):
+        """
+        Adds lines
+
+        Adds lines and adds interval
+        """
         if self.left == 0:
             self.PageClose()
 
@@ -179,6 +184,11 @@ class TextFormat():
                     self.left -= 1
 
     def PrintErr(self, line):
+        """
+        Writes error
+
+
+        """
         print("")
         print("  >>> ERROR: " + line)
         print("")
@@ -276,6 +286,11 @@ class TextFormat():
 
         
     def GetPNum(self):
+        """
+        Gets page number
+
+
+        """
         if self.pnum_type == PNUM_ARABIC:
             pn = str(self.pnum)
         elif self.pnum_type == PNUM_ROMAN:
@@ -331,6 +346,11 @@ class TextFormat():
         
 
     def LineCut(self, line, cw):
+        """
+        Cuts a lines
+
+
+        """
         # Отрезать от строки подстроку шириной не более текущей ширины
         # параграфа по пробелам
         
@@ -387,6 +407,11 @@ class TextFormat():
         pass
 
     def PageClose(self, not_start_new_page = False):
+        """
+        Closes page
+
+        Closes page and start new page
+        """
         self.PrintSym('\f')
         self.left = self.h - self.header_h - 1
         if self.header_vpos == HV_BOTTOM:
@@ -431,6 +456,11 @@ class TextFormat():
         pass
         
     def ProcessCommand(self, line):
+        """
+        Calling commands
+
+
+        """
         m = re.match(r"^\?(\w+)\ +.*", line)
         if m != None:
             cmd = m.group(1)
@@ -467,6 +497,11 @@ class TextFormat():
             self.PrintErr("Unknown command: " + cmd)
         
     def CmdSize(self, line):
+        """
+        Change size of text
+
+
+        """
         m = re.match(r"^\?size\ +(\d+)?,\ *(\d+)?", line)
         if m != None:
             if m.group(1) != None:
@@ -526,6 +561,11 @@ class TextFormat():
             self.PrintErr("Invalid align type: " + line)
 
     def CmdPar(self, line):
+        """
+        Add paragraphs
+
+        Change paragraphs characteristics       
+        """
         m = re.match(r"^\?par\ +(\d+)?,\ *(-?\d+)?", line)
         if m != None:
             self.Flush()
@@ -542,6 +582,11 @@ class TextFormat():
 
 
     def CmdOffset(self, line):
+        """
+        Sets indents
+
+        Change paragraphs characteristics
+        """
         m = re.match(r"^\?offset\ +(\d+)?,\ *(\d+)?", line)
         if m != None:
             self.Flush()
@@ -563,6 +608,11 @@ class TextFormat():
             self.PrintErr("Invalid offset command [" + line + "]")
 
     def CmdInterval(self, line):
+        """
+        Sets space between lines
+
+
+        """
         m = re.match(r"^\?interval\ +(\d+){1}", line)
         if m != None:
             try:
@@ -576,7 +626,12 @@ class TextFormat():
         else:
             self.PrintErr("Invalid interval command [" + line + "]")
 
-    def CmdFeed(self, line):
+    def CmdFeed(self, line):\
+        """
+        Adds empty lines with intervals
+
+
+        """
         m = re.match(r"^\?feed\ +(\d+){1}", line)
         if m != None:
             try:
@@ -591,6 +646,11 @@ class TextFormat():
             self.PrintErr("Invalid feed command [" + line + "]")
 
     def CmdFeedLines(self, line):
+        """
+        Adds empty lines
+
+
+        """
         m = re.match(r"^\?feed_lines\ +(\d+){1}", line)
         if m != None:
             try:
@@ -605,9 +665,19 @@ class TextFormat():
             self.PrintErr("Invalid feed lines command [" + line + "]")
 
     def CmdPageBreak(self, line):
+        """
+        Closes the page
+
+        Closes current paragraph and starts a new page
+        """
         self.PageClose()
 
     def CmdLeft(self, line):
+        """
+        Closes current paragraph
+
+        Checks quantity lines are left on page
+        """
         self.Flush()
         m = re.match(r"^\?left\ +(\d+){1}", line)
         if m != None:
@@ -623,6 +693,11 @@ class TextFormat():
             self.PrintErr("Invalid left command: " + line)
 
     def CmdHeader(self, line):
+        """
+        Creates a header based on specifications
+
+
+        """
         m = re.match(r"^\?header\ +(\d+){1},\ *(\d+){1},\ *(left|right|center|smart){1},\ *(top|bottom){1},\ *(.*)", line)
         if m != None:
             try:
@@ -662,6 +737,11 @@ class TextFormat():
                 self.header_vpos = HV_BOTTOM
             
     def CmdPNum(self, line):
+        """
+        Sets new page number
+
+
+        """
         m = re.match(r"^\?p_num\ +(\d+)?,\ *(arabic|roman|letter){1},\ *(.*)", line)
         if m != None:
             self.pnum = int(m.group(1))
@@ -674,6 +754,11 @@ class TextFormat():
             self.pnum_prefix = m.group(3)
 
     def CmdBr(self, line):
+        """
+        Closes current paragraph
+
+
+        """
         self.Flush()
 
     def CmdFootnote(self, line):
